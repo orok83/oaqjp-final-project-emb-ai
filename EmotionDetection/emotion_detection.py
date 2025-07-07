@@ -13,6 +13,9 @@ def emotion_detector(text_to_analyse):
     myobj= { "raw_document": { "text": text_to_analyse } }
     try:
         response = requests.post(url, json=myobj, headers=header, timeout=10)
+        if response.status_code == 400:
+            return {"anger": None, "disgust": None,"fear": None,"joy": None,"sadness": None, 
+            "dominant_emotion": None }
         formatted_response = response.json()
         emotions = formatted_response["emotionPredictions"][0]["emotion"]
         emotion_scores = {
@@ -23,9 +26,7 @@ def emotion_detector(text_to_analyse):
             "sadness" : emotions["sadness"]
         }
         emotion_scores["dominant_emotion"]=max(emotion_scores, key=emotion_scores.get)
-        if response.status_code == 400:
-            return {"anger": None, "disgust": None,"fear": None,"joy": None,"sadness": None, 
-            "dominant_emotion": None }
+
         return emotion_scores
         #return response.text
     except requests.exceptions.RequestException as e:
